@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import Discord, { Channel } from 'discord.js';
-import { getState, setState } from './bot-state';
+import Discord from 'discord.js';
+import { getState } from './bot-state';
 import { leaveChannel, playMusic, searchYT } from './dj';
 
 const token = process.env.BOT_TOKEN;
@@ -39,12 +39,13 @@ const commandPlay = async (msg: Discord.Message) => {
         return msg.reply(`Já existe uma música sendo tocada`);
     }
 
-    const musicUrl = await searchYT(musicName);
-    if (!musicUrl) {
+    const music = await searchYT(musicName);
+    if (!music) {
         return msg.reply(`Música não encontrada`);
     }
 
-    return playMusic(serverId, voiceChannel, musicUrl);
+    msg.reply(`🎵 Tocando ${music.title}`);
+    return playMusic(serverId, voiceChannel, music.url);
 }
 
 const commandStop = async (msg: Discord.Message) => { 

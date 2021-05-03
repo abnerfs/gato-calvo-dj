@@ -5,13 +5,13 @@ import ytSearch from 'yt-search';
 import yts from 'yt-search';
 
 
-export const searchYT = async (search: string): Promise<string> => {
+export const searchYT = async (search: string): Promise<ytSearch.VideoSearchResult | undefined> => {
     return new Promise((resolve, reject) => {
         ytSearch(search, function (err: Error | string | null | undefined, r: yts.SearchResult) {
             if (err)
                 reject(err);
 
-            const firstResult = r?.videos[0]?.url;
+            const firstResult = r?.videos[0];
             resolve(firstResult);
         })
     });
