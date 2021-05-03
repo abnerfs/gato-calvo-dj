@@ -1,0 +1,26 @@
+{
+  "name": "bot-musica-poc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/opus": "^0.5.0",
+    "@types/dotenv": "^8.2.0",
+    "@types/node": "^15.0.1",
+    "discord.js": "^12.5.3",
+    "dotenv": "^8.2.0",
+    "ffmpeg-static": "^4.3.0",
+    "ts-node": "^9.1.1",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "^4.2.4",
+    "yt-search": "^2.8.0",
+    "ytdl-core": "^4.5.0"
+  }
+}
