@@ -3,7 +3,7 @@ dotenv.config();
 
 import Discord from 'discord.js';
 import { getState } from './bot-state';
-import { leaveChannel, playMusic, searchYT } from './dj';
+import { leaveChannel, playMusic, searchYT, skipMusic } from './dj';
 import { embedFactory } from './messages';
 
 const token = process.env.BOT_TOKEN;
@@ -20,6 +20,7 @@ client.on('ready', () => {
 const playCommand = `${BOT_PREFIX}play`;
 const stopCommand = `${BOT_PREFIX}stop`;
 const queueCommand = `${BOT_PREFIX}queue`;
+const skipCommand = `${BOT_PREFIX}skip`;
 
 const getServerId = (msg: Discord.Message) => msg.guild?.id || '';
 const getVoiceChannel = (msg: Discord.Message) => msg.member?.voice.channel;
@@ -52,6 +53,15 @@ const commandStop = async (msg: Discord.Message) => {
         return msg.reply('Nenhuma música sendo tocada');
 
     return await leaveChannel(serverId, true);
+}
+
+const commandSkip = async (msg: Discord.Message) => {
+    const serverId = getServerId(msg);
+    const state = getState(serverId);
+    if (!state.playing)
+        return msg.reply('Nenhuma música sendo tocada');
+
+    await skipMusic(serverId);
 }
 
 const commandQueue = async (msg: Discord.Message) => {
@@ -88,6 +98,9 @@ client.on('message', async (msg: Discord.Message) => {
     }
     else if (msg.content.startsWith(queueCommand)) {
         await commandQueue(msg);
+    }
+    else if (msg.content.startsWith(skipCommand)) {
+        await commandSkip(msg);
     }
 });
 

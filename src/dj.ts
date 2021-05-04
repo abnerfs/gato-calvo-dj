@@ -34,6 +34,16 @@ export const leaveChannel = async (serverId: string, endConnection: boolean) => 
     });
 }
 
+export const skipMusic = async (serverId: string) => {
+    const state = getState(serverId);
+    await state.channelConnection?.dispatcher.end();
+    state.queue.shift();
+
+    setState(serverId, state);
+    if(state.queue.length)
+        playMusicConnection(serverId, state.channelConnection as VoiceConnection, state.queue[0].url);
+}
+
 const addToQueue = async (serverId: string, music: VideoSearchResult) => {
     const state = getState(serverId);
     state.playing = true;
@@ -64,6 +74,10 @@ export const playMusic = async (serverId: string, voiceChannel: VoiceChannel, mu
     const state = getState(serverId);
     if (!state.playing) {
         const connection = await voiceChannel.join();
+        state.voiceChannel = voiceChannel;
+        state.channelConnection = connection;
+        setState(serverId, state);
+
         await playMusicConnection(serverId, connection, music.url);
         msg.reply(`Tocando 🎵 ${music.title}!`);
     }
