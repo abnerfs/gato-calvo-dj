@@ -65,10 +65,10 @@ export const playMusic = async (serverId: string, voiceChannel: VoiceChannel, mu
     if (!state.playing) {
         const connection = await voiceChannel.join();
         await playMusicConnection(serverId, connection, music.url);
-        msg.reply(`🎵 Tocando ${music.title}`);
+        msg.reply(`Tocando 🎵 ${music.title}!`);
     }
     else {
-        msg.reply(`🎵 Música ${music.title} adicionada à fila!`);
+        msg.reply(`Música 🎵 ${music.title} adicionada à fila!`);
     }
 
     await addToQueue(serverId, music);
