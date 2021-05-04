@@ -34,24 +34,18 @@ const commandPlay = async (msg: Discord.Message) => {
     }
 
     const serverId = getServerId(msg);
-    const state = getState(serverId);
-    if (state.playing) {
-        return msg.reply(`Já existe uma música sendo tocada`);
-    }
-
     const music = await searchYT(musicName);
     if (!music) {
         return msg.reply(`Música não encontrada`);
     }
 
-    msg.reply(`🎵 Tocando ${music.title}`);
-    return playMusic(serverId, voiceChannel, music.url);
+    return playMusic(serverId, voiceChannel, music, msg);
 }
 
-const commandStop = async (msg: Discord.Message) => { 
+const commandStop = async (msg: Discord.Message) => {
     const serverId = getServerId(msg);
-    const state = getState(serverId);   
-    if(!state.playing) 
+    const state = getState(serverId);
+    if (!state.playing)
         return msg.reply('Nenhuma música sendo tocada');
 
     return await leaveChannel(serverId, true);

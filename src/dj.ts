@@ -1,7 +1,7 @@
-import { VoiceChannel } from 'discord.js';
+import { Message, VoiceChannel, VoiceConnection } from 'discord.js';
 import ytdl from 'ytdl-core';
 import { getState, setState } from './bot-state';
-import ytSearch from 'yt-search';
+import ytSearch, { VideoSearchResult } from 'yt-search';
 import yts from 'yt-search';
 
 
@@ -21,7 +21,7 @@ export const searchYT = async (search: string): Promise<ytSearch.VideoSearchResu
 export const leaveChannel = async (serverId: string, endConnection: boolean) => {
     const state = getState(serverId);
 
-    if(endConnection)
+    if (endConnection)
         await state.channelConnection?.dispatcher.end();
 
     await state.voiceChannel?.leave();
@@ -29,23 +29,47 @@ export const leaveChannel = async (serverId: string, endConnection: boolean) => 
     setState(serverId, {
         playing: false,
         channelConnection: undefined,
-        voiceChannel: undefined
+        voiceChannel: undefined,
+        queue: []
     });
 }
 
-export const playMusic = async (serverId: string, voiceChannel: VoiceChannel, musicUrl: string) => {
-    const connection = await voiceChannel.join();
-    setState(serverId, {
-        playing: true,
-        channelConnection: connection,
-        voiceChannel
-    });
+const addToQueue = async (serverId: string, music: VideoSearchResult) => {
+    const state = getState(serverId);
+    state.playing = true;
+    state.queue.push(music);
+    await setState(serverId, state);
+}
 
+const playMusicConnection = (serverId: string, connection: VoiceConnection, musicUrl: string) => {
     connection.play(ytdl(musicUrl, { filter: 'audioonly' }))
         .on('finish', async () => {
-            leaveChannel(serverId, false);
+            const state = getState(serverId);
+            state.queue.shift();
+            setState(serverId, state);
+
+            if (!state.queue.length) {
+                leaveChannel(serverId, false);
+            }
+            else {
+                playMusicConnection(serverId, connection, state.queue[0].url);
+            }
         })
         .on('error', error => {
             console.log(error);
         });
+}
+
+export const playMusic = async (serverId: string, voiceChannel: VoiceChannel, music: VideoSearchResult, msg: Message) => {
+    const state = getState(serverId);
+    if (!state.playing) {
+        const connection = await voiceChannel.join();
+        await playMusicConnection(serverId, connection, music.url);
+        msg.reply(`🎵 Tocando ${music.title}`);
+    }
+    else {
+        msg.reply(`🎵 Música ${music.title} adicionada à fila!`);
+    }
+
+    await addToQueue(serverId, music);
 }
