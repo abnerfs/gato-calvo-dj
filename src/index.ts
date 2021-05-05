@@ -61,7 +61,7 @@ const commandSkip = async (msg: Discord.Message) => {
     if (!state.playing)
         return msg.reply('Nenhuma música sendo tocada');
 
-    await skipMusic(serverId);
+    return await skipMusic(serverId);
 }
 
 const commandQueue = async (msg: Discord.Message) => {
@@ -72,8 +72,29 @@ const commandQueue = async (msg: Discord.Message) => {
 
     let i = 1;
 
+    const formatDuration = (totalSeconds: number) => {
+        console.log(totalSeconds);
+
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds / 60 - (hours * 60)));
+        const seconds = totalSeconds - (hours * 3600) - (minutes * 60);
+        
+        return {
+            hours,
+            minutes,
+            seconds
+        }
+    }
+
+    const hourPartPad = (amount: number) => {
+        return amount.toString().padStart(2, '0');
+    }
+
     let queue = state.queue.map(x => {
-        return `[${i++} - ${x.title}](${x.url})`
+        console.log(x.duration.seconds);
+        const duration = formatDuration(x.duration.seconds);
+
+        return `[${i++} - ${x.title} - ${hourPartPad(duration.hours)}:${hourPartPad(duration.minutes)}:${hourPartPad(duration.seconds)} ](${x.url}) `
     })
         .join('\r\n');;
 
