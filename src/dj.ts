@@ -52,7 +52,7 @@ const addToQueue = async (serverId: string, music: VideoSearchResult) => {
 }
 
 const playMusicConnection = (serverId: string, connection: VoiceConnection, musicUrl: string) => {
-    connection.play(ytdl(musicUrl, { filter: 'audioonly' }))
+    connection.play(ytdl(musicUrl, { filter: 'audioonly', highWaterMark: 1 << 25 }))
         .on('finish', async () => {
             const state = getState(serverId);
             state.queue.shift();

@@ -7,7 +7,7 @@ import { leaveChannel, playMusic, searchYT, skipMusic } from './dj';
 import { embedFactory } from './messages';
 
 const token = process.env.BOT_TOKEN;
-const BOT_PREFIX = 'dj!';
+const BOT_PREFIX = '.';
 export const BOT_NAME = 'Bot de música'
 
 const client = new Discord.Client();
