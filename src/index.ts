@@ -7,7 +7,7 @@ import { leaveChannel, playMusic, searchYT, skipMusic } from './dj';
 import { embedFactory } from './messages';
 
 const token = process.env.BOT_TOKEN;
-const BOT_PREFIX = '.';
+const BOT_PREFIX = process.env.BOT_PREFIX || '.';
 export const BOT_NAME = 'Bot de música'
 
 const client = new Discord.Client();
@@ -78,7 +78,7 @@ const commandQueue = async (msg: Discord.Message) => {
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds / 60 - (hours * 60)));
         const seconds = totalSeconds - (hours * 3600) - (minutes * 60);
-        
+
         return {
             hours,
             minutes,
@@ -108,20 +108,23 @@ const commandQueue = async (msg: Discord.Message) => {
 }
 
 
-
-
 client.on('message', async (msg: Discord.Message) => {
-    if (msg.content.startsWith(playCommand)) {
-        await commandPlay(msg);
+    try {
+        if (msg.content.startsWith(playCommand)) {
+            await commandPlay(msg);
+        }
+        else if (msg.content.startsWith(stopCommand)) {
+            await commandStop(msg);
+        }
+        else if (msg.content.startsWith(queueCommand)) {
+            await commandQueue(msg);
+        }
+        else if (msg.content.startsWith(skipCommand)) {
+            await commandSkip(msg);
+        }
     }
-    else if (msg.content.startsWith(stopCommand)) {
-        await commandStop(msg);
-    }
-    else if (msg.content.startsWith(queueCommand)) {
-        await commandQueue(msg);
-    }
-    else if (msg.content.startsWith(skipCommand)) {
-        await commandSkip(msg);
+    catch (err) {
+        console.log(err);
     }
 });
 
