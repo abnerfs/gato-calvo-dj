@@ -7,7 +7,7 @@ import path from 'path';
 
 const searchProcess = fork(path.join(__dirname, 'search'));
 
-export const searchYT = async (search: string): Promise<ytSearch.VideoSearchResult | undefined> => {
+export const searchYT = async (search: any): Promise<ytSearch.VideoSearchResult[] | undefined> => {
     return new Promise((resolve, reject) => {
         searchProcess
             .on('message', ({ type, data }: any) => {
@@ -46,7 +46,7 @@ export const skipMusic = async (serverId: string) => {
         playMusicConnection(serverId, state.channelConnection as VoiceConnection, state.queue[0].url);
 }
 
-const addToQueue = async (serverId: string, music: VideoSearchResult) => {
+export const addToQueue = async (serverId: string, music: VideoSearchResult) => {
     const state = getState(serverId);
     state.playing = true;
     state.queue.push(music);
@@ -79,7 +79,6 @@ export const playMusic = async (serverId: string, voiceChannel: VoiceChannel, mu
         state.voiceChannel = voiceChannel;
         state.channelConnection = connection;
         setState(serverId, state);
-
         await playMusicConnection(serverId, connection, music.url);
         msg.reply(`🎵 ${music.title}`);
     }

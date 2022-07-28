@@ -5,7 +5,6 @@ process.on('message', async (search) => {
         if (err)
             process.send!({ type: 'search-error', data: err })
 
-        const firstResult = r?.videos[0];
-        process.send!({ type: 'search-success', data: firstResult })
+        process.send!({ type: 'search-success', data: r?.videos })
     })
 })

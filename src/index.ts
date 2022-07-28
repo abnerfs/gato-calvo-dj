@@ -3,7 +3,7 @@ dotenv.config();
 
 import Discord from 'discord.js';
 import { getState } from './bot-state';
-import { leaveChannel, playMusic, searchYT, skipMusic } from './dj';
+import { addToQueue, leaveChannel, playMusic, searchYT, skipMusic } from './dj';
 import { embedFactory } from './messages';
 
 const token = process.env.BOT_TOKEN;
@@ -26,6 +26,17 @@ const getServerId = (msg: Discord.Message) => msg.guild?.id || '';
 const getVoiceChannel = (msg: Discord.Message) => msg.member?.voice.channel;
 
 
+const parseSearch = (search: string): any => {
+    if (search.indexOf('list=') > -1) {
+        const listId = search.split('list=')[1];
+        if (listId)
+            return {
+                listId
+            }
+    }
+    return search
+}
+
 const commandPlay = async (msg: Discord.Message) => {
     const musicName = msg.content.replace(playCommand, '').trim();
     if (!musicName) {
@@ -38,12 +49,25 @@ const commandPlay = async (msg: Discord.Message) => {
     }
 
     const serverId = getServerId(msg);
-    const music = await searchYT(musicName);
-    if (!music) {
+    const search = parseSearch(musicName);
+    let results = (await searchYT(search))?.map(x => {
+        if (!x.url)
+            x.url = x.url || `https://www.youtube.com/watch?v=${x.videoId}`;
+        return x
+    });
+
+    if (!results?.length) {
         return msg.reply(`Música não encontrada`);
     }
 
-    return playMusic(serverId, voiceChannel, music, msg);
+    if (!search.listId) {
+        results = results.slice(0, 1)
+    }
+
+    await playMusic(serverId, voiceChannel, results[0], msg);
+    for (const music of results.slice(1)) {
+        addToQueue(serverId, music);
+    }
 }
 
 const commandStop = async (msg: Discord.Message) => {
@@ -73,8 +97,6 @@ const commandQueue = async (msg: Discord.Message) => {
     let i = 1;
 
     const formatDuration = (totalSeconds: number) => {
-        console.log(totalSeconds);
-
         const hours = Math.floor(totalSeconds / 3600);
         const minutes = Math.floor((totalSeconds / 60 - (hours * 60)));
         const seconds = totalSeconds - (hours * 3600) - (minutes * 60);
@@ -91,11 +113,11 @@ const commandQueue = async (msg: Discord.Message) => {
     }
 
     let queue = state.queue.map(x => {
-        console.log(x.duration.seconds);
         const duration = formatDuration(x.duration.seconds);
 
         return `[${i++} - ${x.title} - ${hourPartPad(duration.hours)}:${hourPartPad(duration.minutes)}:${hourPartPad(duration.seconds)} ](${x.url}) `
     })
+        .slice(0, 10)
         .join('\r\n');;
 
     const embed = embedFactory({
