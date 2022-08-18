@@ -68,6 +68,7 @@ const commandPlay = async (msg: Discord.Message) => {
     for (const music of results.slice(1)) {
         addToQueue(serverId, music);
     }
+    return;
 }
 
 const commandStop = async (msg: Discord.Message) => {
