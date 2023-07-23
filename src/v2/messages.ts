@@ -1,12 +1,11 @@
-import Discord from 'discord.js'
-import { BOT_NAME } from '.';
+import { ColorResolvable, EmbedBuilder } from 'discord.js';
 
 const DEFAULT_EMBED_COLOR = '#0099ff';
 const DEFAULT_ICON = undefined;
 
 export const embedFactory = (params:
     {
-        author?: {
+        author: {
             author: string,
             iconURL?: string,
             url?: string
@@ -19,18 +18,19 @@ export const embedFactory = (params:
             name: string,
             value: string,
             inline: boolean
-        }[], color?: string
+        }[], color?: ColorResolvable
     }) => {
-    const embed = new Discord.MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(params.color || DEFAULT_EMBED_COLOR);
 
     if (params.title)
         embed.setTitle(params.title);
 
-    if (params.author)
-        embed.setAuthor(params.author.author, params.author.iconURL || DEFAULT_ICON, params.author.url);
-    else
-        embed.setAuthor(BOT_NAME, DEFAULT_ICON);
+    embed.setAuthor({
+        name: params.author.author,
+        iconURL: params.author.iconURL || DEFAULT_ICON,
+        url: params.author.url
+    });
 
     if (params.description)
         embed.setDescription(params.description);
@@ -38,10 +38,10 @@ export const embedFactory = (params:
     if (params.fields)
         embed.addFields(params.fields);
 
-     embed.setFooter(`@${BOT_NAME} by github.com/abnerfs`, DEFAULT_ICON);
+    embed.setFooter({
+        text: `by github.com/abnerfs`,
+        iconURL: DEFAULT_ICON
+    });
 
-    return {
-        content: params.content,
-        embed
-    };
+    return embed;
 }
