@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Client, GuildMember, SlashCommandBuilder, SlashCommandStringOption, VoiceBasedChannel } from "discord.js";
+import { ChatInputCommandInteraction, GuildMember, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 import { BotCommand } from ".";
 import { searchYT } from "../search";
 
