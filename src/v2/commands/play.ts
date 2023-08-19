@@ -21,7 +21,7 @@ export const playCommand: BotCommand = {
             interaction.reply('❌ You need to be in a voice channel to use this command');
             return;
         }
-
+        await interaction.deferReply({ ephemeral: true });
         const guildId = interaction.guild!.id;
 
         const query = interaction.options.getString('query')!;
@@ -32,15 +32,15 @@ export const playCommand: BotCommand = {
                 youtube_url: searchResult.url,
                 seconds: searchResult.duration.seconds
             })
-            if(player.playMusic(guildId)) {
-                interaction.reply(`🎵  Now playing "${searchResult.title}"!`);
+            if (player.playMusic(guildId)) {
+                interaction.followUp(`🎵  Now playing "${searchResult.title}"!`);
             }
             else {
-                interaction.reply(`🎵  Added "${searchResult.title}" to the queue!`);
+                interaction.followUp(`🎵  Added "${searchResult.title}" to the queue!`);
             }
         }
         else {
-            interaction.reply(`❌ Zero videos found for query ${query}`);
+            interaction.followUp(`❌ Zero videos found for query ${query}`);
         }
         return;
     }
