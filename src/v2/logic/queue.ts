@@ -1,10 +1,8 @@
-import { User } from "discord.js";
-
 export type Music = {
     name: string;
     youtube_url: string;
     seconds: number;
-    added_by: User
+    added_by: string
 }
 
 type State = {
@@ -51,16 +49,19 @@ export class MusicQueue {
     }
 
     pop(guildId: string): { music: Music, channelId: string } | undefined {
-        if (!this.state[guildId] || !this.state[guildId].musics.length)
+        if (!this.state[guildId])
             return;
 
         const state = this.state[guildId];
-        const music = state.musics.slice(-1)[0];
+        const music = state.musics[0];
         Object.assign(state, {
             nowPlaying: music,
-            musics: state.musics.slice(0, state.musics.length - 1)
+            musics: state.musics.slice(1)
         });
 
+        if(!music)
+            return;
+        
         return {
             music: music,
             channelId: state.channelId

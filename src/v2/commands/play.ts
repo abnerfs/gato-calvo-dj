@@ -33,7 +33,7 @@ export const playCommand: BotCommand = {
                 name: searchResult.title,
                 youtube_url: searchResult.url,
                 seconds: searchResult.duration.seconds,
-                added_by: interaction.user
+                added_by: interaction.user.id
             });
 
             if (player.playMusic(guildId)) {
