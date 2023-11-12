@@ -7,4 +7,4 @@ process.on('message', async (search: string) => {
 
         process.send!({ type: 'search-success', data: r?.videos || [] })
     })
-})
+});

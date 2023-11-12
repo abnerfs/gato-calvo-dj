@@ -1,5 +1,5 @@
 import { Client, VoiceBasedChannel } from "discord.js";
-import { BotQueue } from "./logic/queue";
+import { MusicQueue } from "./logic/queue";
 import { AudioPlayer, AudioPlayerStatus, NoSubscriberBehavior, VoiceConnectionStatus, createAudioPlayer, createAudioResource, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import ytdl from "ytdl-core";
 
@@ -7,57 +7,59 @@ import ytdl from "ytdl-core";
 export class Player {
     players: { [guildId: string]: AudioPlayer | undefined } = {}
 
-    constructor(private queue: BotQueue, private bot: Client) {
+    constructor(private queue: MusicQueue, private bot: Client) {
 
     }
 
-    private destroyPlayer(guildId: string) {
-        if(this.players[guildId]) {
+    private destroy(guildId: string) {
+        if (this.players[guildId]) {
             this.players[guildId]!.stop();
         }
-    }
-
-    private destroyConnection(guildId: string) {
         const voiceConnection = getVoiceConnection(guildId);
         if (voiceConnection) {
             voiceConnection.destroy();
         }
     }
 
-    private initializePlayer(guildId: string) {
-        if (!this.players[guildId]) {
-            const player = createAudioPlayer({
-                behaviors: {
-                    noSubscriber: NoSubscriberBehavior.Stop,
-                },
-            });
-
-            player.on(AudioPlayerStatus.Idle, () => {
+    private playerIdleHandler =
+        (guildId: string) =>
+            () => {
                 if (!this.queue.isEmpty(guildId)) {
                     this.playMusic(guildId);
                 }
                 else {
-                    this.destroyPlayer(guildId);
-                    this.destroyConnection(guildId);
+                    this.destroy(guildId);
                 }
-            });
+            }
 
-            this.players[guildId] = player;
-        }
-        return this.players[guildId]!;
+    private getExistingOrNewPlayer(guildId: string) {
+        if (this.players[guildId])
+            return this.players[guildId]!;
+
+        const player = createAudioPlayer({
+            behaviors: {
+                noSubscriber: NoSubscriberBehavior.Stop,
+            },
+        });
+
+        player.on(AudioPlayerStatus.Idle, this.playerIdleHandler(guildId));
+        this.players[guildId] = player;
+        return player;
     }
 
     skip(guildId: string) {
-        this.destroyPlayer(guildId);
+        this.destroy(guildId);
     }
 
     playMusic(guildId: string) {
-        if (this.initializePlayer(guildId).state.status != AudioPlayerStatus.Idle)
+        if (this.getExistingOrNewPlayer(guildId).state.status != AudioPlayerStatus.Idle)
             return;
 
-        const { channelId, music } = this.queue.popMusic(guildId);
-        if (!channelId || !music)
+        const popResult = this.queue.pop(guildId);
+        if (!popResult)
             return;
+
+        const { channelId, music } = popResult;
 
         const resource = createAudioResource(ytdl(music.youtube_url, { filter: 'audioonly', highWaterMark: 1 << 25 }));
         const rawChannel = this.bot.guilds.cache.get(guildId)!.channels.cache.get(channelId)!;
@@ -72,7 +74,7 @@ export class Player {
             });
 
             const readyCallBack = () => {
-                const player = this.initializePlayer(guildId);
+                const player = this.getExistingOrNewPlayer(guildId);
                 connection.subscribe(player);
                 player.play(resource);
             }

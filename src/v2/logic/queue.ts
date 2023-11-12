@@ -1,17 +1,21 @@
+import { User } from "discord.js";
+
 export type Music = {
     name: string;
     youtube_url: string;
     seconds: number;
+    added_by: User
 }
 
 type State = {
     [guildId: string]: {
         channelId: string,
+        nowPlaying?: Music,
         musics: Music[]
     }
 }
 
-export class BotQueue {
+export class MusicQueue {
     state: State = {};
 
     constructor() {
@@ -22,28 +26,44 @@ export class BotQueue {
         return !this.state[guildId] || this.state[guildId]!.musics.length == 0;
     }
 
-    queue = (guild: string) => this.state[guild]?.musics || [];
+    queue = (guild: string): Music[] => {
+        const state = this.state[guild];
+        if (!state)
+            return [];
 
-    enqueueMusic(guildId: string, channelId: string, music: Music) {
-        if (!this.state[guildId]) {
-            this.state[guildId] = {
-                channelId,
-                musics: [music]
-            }
-        }
-        else {
-            this.state[guildId].channelId = channelId;
-            this.state[guildId].musics.push(music);
-        }
+        if (state.nowPlaying)
+            return [state.nowPlaying, ...state.musics]
+
+        return state.musics;
     }
 
-    popMusic(guildId: string) {
-        if (this.state[guildId]) {
-            return {
-                music: this.state[guildId].musics.shift(),
-                channelId: this.state[guildId].channelId
-            };
-        }
-        return {};
+    add(guildId: string, channelId: string, music: Music) {
+        if (!this.state[guildId])
+            this.state[guildId] = {
+                channelId,
+                musics: []
+            }
+
+        let state = { ...this.state[guildId] };
+        state.channelId = channelId;
+        state.musics.push(music);
+        Object.assign(this.state[guildId], state);
+    }
+
+    pop(guildId: string): { music: Music, channelId: string } | undefined {
+        if (!this.state[guildId] || !this.state[guildId].musics.length)
+            return;
+
+        const state = this.state[guildId];
+        const music = state.musics.slice(-1)[0];
+        Object.assign(state, {
+            nowPlaying: music,
+            musics: state.musics.slice(0, state.musics.length - 1)
+        });
+
+        return {
+            music: music,
+            channelId: state.channelId
+        };
     }
 }

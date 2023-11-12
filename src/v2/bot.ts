@@ -1,7 +1,7 @@
 import { CacheType, Client, Events, GatewayIntentBits, Guild, Interaction } from "discord.js";
 import { BOT_TOKEN } from "./config";
 import { commandDispatcher, setupCommands } from "./commands";
-import { BotQueue } from "./logic/queue";
+import { MusicQueue } from "./logic/queue";
 import { Player } from "./player";
 
 const bot = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
@@ -15,7 +15,7 @@ bot.on('guildCreate', async ({ id, name }: Guild) => {
     console.log(`Commands set in ${name}`);
 })
 
-const queue = new BotQueue();
+const queue = new MusicQueue();
 const player = new Player(queue, bot);
 
 bot.on(Events.InteractionCreate, (interaction: Interaction<CacheType>) => {
