@@ -1,14 +1,14 @@
 import { BOT_CLIENT_ID, BOT_TOKEN } from '../config';
 import { ChatInputCommandInteraction, Client, REST, Routes, SlashCommandBuilder } from "discord.js"
 import { playCommand } from "./play";
-import { BotQueue } from '../logic/queue';
+import { MusicQueue } from '../logic/queue';
 import { Player } from '../player';
 import { skipCommand } from './skip';
 import { queueCommand } from './queue';
 
 type HandlerParams = {
     interaction: ChatInputCommandInteraction,
-    queue: BotQueue,
+    queue: MusicQueue,
     bot: Client,
     player: Player
 }

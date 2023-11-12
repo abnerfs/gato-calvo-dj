@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, GuildMember, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 import { BotCommand } from ".";
 import { searchSC, searchYT } from "../search";
+import { userToMention } from "../util";
 
 const voiceChannelFromInteraction = (interaction: ChatInputCommandInteraction) => {
     const member = interaction.member as GuildMember;
@@ -31,43 +32,49 @@ export const playCommand: BotCommand = {
 
         const DEFAULT_PLATFORM = 'youtube';
         const query = interaction.options.getString('query')!;
+        
         const platform = interaction.options.getString('platform') ?? DEFAULT_PLATFORM;
-
-        if (platform == 'youtube') {
+        const mention = userToMention(interaction.user);
+        
+        if (platform === 'youtube') {
             const searchResult = await searchYT(query);
+
             if (searchResult) {
-                queue.enqueueMusic(guildId, voiceChannel.id, {
+                queue.add(guildId, voiceChannel.id, {
                     name: searchResult.title,
                     url: searchResult.url,
-                    seconds: searchResult.duration.seconds
-                })
+                    seconds: searchResult.duration.seconds,
+                    added_by: interaction.user.id
+                });
+    
                 if (player.playMusic(guildId)) {
-                    interaction.followUp(`🎵  Now playing "${searchResult.title}"!`);
+                    interaction.followUp(`✅ Done`);
+                    interaction.channel?.send(`🎵 Now playing "${searchResult.title}", added by ${mention}.`);
                 }
                 else {
-                    interaction.followUp(`🎵  Added "${searchResult.title}" to the queue!`);
+                    interaction.followUp(`✅ Done`);
+                    interaction.channel?.send(`🎵 "${searchResult.title}" was added to the queue by ${mention}.`);
                 }
             }
-            else {
-                interaction.followUp(`❌ Zero videos found for query ${query}`);
-            }
-        } else if (platform == "soundcloud") {
+        } else if (platform === 'soundcloud') {
             const searchResult = await searchSC(query);
 
             if (searchResult) {
-                queue.enqueueMusic(guildId, voiceChannel.id, {
+                queue.add(guildId, voiceChannel.id, {
                     name: searchResult.title,
                     url: searchResult.uri,
-                    seconds: searchResult.full_duration
-                })
-
+                    seconds: searchResult.full_duration,
+                    added_by: interaction.user.id
+                });
+    
                 if (player.playMusic(guildId)) {
-                    interaction.followUp(`🎵  Now playing "${searchResult.title}"!`);
-                } else {
-                    interaction.followUp(`🎵  Added "${searchResult.title}" to the queue!`);
+                    interaction.followUp(`✅ Done`);
+                    interaction.channel?.send(`🎵 Now playing "${searchResult.title}", added by ${mention}.`);
                 }
-            } else {
-                interaction.followUp(`❌ Zero videos found for query ${query}`);
+                else {
+                    interaction.followUp(`✅ Done`);
+                    interaction.channel?.send(`🎵 "${searchResult.title}" was added to the queue by ${mention}.`);
+                }
             }
         }
         return;
