@@ -32,7 +32,6 @@ export const queueCommand: BotCommand = {
             let i = 1;
             let queue = q.map(x => {
                 const duration = formatDuration(x.seconds);
-
                 return `[${i++} - ${x.name} - ${hourPartPad(duration.hours)}:${hourPartPad(duration.minutes)}:${hourPartPad(duration.seconds)} ](${x.youtube_url}) `
             })
                 .slice(0, 10)
@@ -44,7 +43,7 @@ export const queueCommand: BotCommand = {
                 },
                 description: queue
             })
-            interaction.reply({ embeds: [embed]});
+            interaction.reply({ embeds: [embed] });
         }
     }
 }
