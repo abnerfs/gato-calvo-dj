@@ -1,6 +1,6 @@
 export type Music = {
     name: string;
-    youtube_url: string;
+    url: string;
     seconds: number;
 }
 

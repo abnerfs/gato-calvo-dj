@@ -59,7 +59,7 @@ export class Player {
         if (!channelId || !music)
             return;
 
-        const resource = createAudioResource(ytdl(music.youtube_url, { filter: 'audioonly', highWaterMark: 1 << 25 }));
+        const resource = createAudioResource(ytdl(music.url, { filter: 'audioonly', highWaterMark: 1 << 25 }));
         const rawChannel = this.bot.guilds.cache.get(guildId)!.channels.cache.get(channelId)!;
 
         if (rawChannel.isVoiceBased()) {
