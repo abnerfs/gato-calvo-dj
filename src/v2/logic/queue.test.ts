@@ -1,10 +1,14 @@
-import { BotQueue, Music } from './queue';
+import { MusicQueue, Music } from './queue';
+
+const guildId = 'guild1';
+const channelId = 'channel1';
+const added_by = '1203312312312';
 
 describe('BotQueue', () => {
-  let botQueue: BotQueue;
+  let botQueue: MusicQueue;
 
   beforeEach(() => {
-    botQueue = new BotQueue();
+    botQueue = new MusicQueue();
   });
 
   afterEach(() => {
@@ -12,33 +16,64 @@ describe('BotQueue', () => {
   });
 
   test('should enqueue and dequeue music correctly', () => {
-    const guildId = 'guild1';
-    const channelId = 'channel1';
-    const music1: Music = { name: 'Song 1', youtube_url: 'youtube.com/song1', seconds: 180 };
-    const music2: Music = { name: 'Song 2', youtube_url: 'youtube.com/song2', seconds: 210 };
+    const music1: Music = { name: 'Song 1', youtube_url: 'youtube.com/song1', seconds: 180, added_by };
+    const music2: Music = { name: 'Song 2', youtube_url: 'youtube.com/song2', seconds: 210, added_by };
 
-    botQueue.enqueueMusic(guildId, channelId, music1);
-    botQueue.enqueueMusic(guildId, channelId, music2);
+    botQueue.add(guildId, channelId, music1);
+    expect(botQueue.state[guildId]).toEqual({ channelId: channelId, musics: [music1] });
+    botQueue.add(guildId, channelId, music2);
+    expect(botQueue.state[guildId]).toEqual({ channelId: channelId, musics: [music1, music2] });
 
     expect(botQueue.isEmpty(guildId)).toBe(false);
 
-    const dequeuedMusic1 = botQueue.popMusic(guildId);
-    expect(dequeuedMusic1).toEqual({ music: music1, channelId });
+    expect(botQueue.pop(guildId)).toEqual({ music: music1, channelId });
+    expect(botQueue.state[guildId]).toEqual({ channelId: channelId, nowPlaying: music1, musics: [music2] });
 
-    const dequeuedMusic2 = botQueue.popMusic(guildId);
-    expect(dequeuedMusic2).toEqual({ music: music2, channelId });
+    expect(botQueue.pop(guildId)).toEqual({ music: music2, channelId });
+    expect(botQueue.state[guildId]).toEqual({ channelId: channelId, nowPlaying: music2, musics: [] });
+
+    expect(botQueue.pop(guildId)).toBeUndefined();
+    expect(botQueue.state[guildId]).toEqual({ channelId: channelId, nowPlaying: undefined, musics: [] });
 
     expect(botQueue.isEmpty(guildId)).toBe(true);
   });
 
-  test('should return an empty object if the queue is empty', () => {
-    const guildId = 'guild2';
-    const emptyQueueResult = botQueue.popMusic(guildId);
-    expect(emptyQueueResult).toEqual({});
+  test('should return undefined if the queue is empty', () => {
+    const emptyQueueResult = botQueue.pop(guildId);
+    expect(emptyQueueResult).toBeUndefined();
+  });
+
+  test('should return queue considering music being currently played', () => {
+    const music1: Music = { name: 'Song 1', youtube_url: 'youtube.com/song1', seconds: 180, added_by };
+    const music2: Music = { name: 'Song 2', youtube_url: 'youtube.com/song2', seconds: 210, added_by };
+    const music3: Music = { name: 'Song 3', youtube_url: 'youtube.com/song3', seconds: 210, added_by };
+
+    botQueue.add(guildId, channelId, music1);
+    botQueue.add(guildId, channelId, music2);
+    botQueue.add(guildId, channelId, music3);
+
+    expect(botQueue.state[guildId]).toEqual({ channelId: channelId, musics: [music1, music2, music3] });
+    expect(botQueue.queue(guildId)).toEqual([music1, music2, music3]);
+
+    expect(botQueue.pop(guildId)).toEqual({ music: music1, channelId });
+    expect(botQueue.queue(guildId)).toEqual([music1, music2, music3]);
+
+    expect(botQueue.pop(guildId)).toEqual({ music: music2, channelId });
+    expect(botQueue.queue(guildId)).toEqual([music2, music3]);
+
+    expect(botQueue.pop(guildId)).toEqual({ music: music3, channelId });
+    expect(botQueue.queue(guildId)).toEqual([music3]);
+
+    expect(botQueue.pop(guildId)).toBeUndefined();
+    expect(botQueue.queue(guildId)).toEqual([]);
+  });
+
+  test('should return undefined if the queue is empty', () => {
+    const emptyQueueResult = botQueue.pop(guildId);
+    expect(emptyQueueResult).toBeUndefined();
   });
 
   test('should return an empty array if the queue is not present for a guildId', () => {
-    const guildId = 'non_existent_guild';
     const queue = botQueue.queue(guildId);
     expect(queue).toEqual([]);
   });

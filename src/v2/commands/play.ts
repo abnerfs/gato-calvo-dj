@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, GuildMember, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 import { BotCommand } from ".";
 import { searchYT } from "../search";
+import { userToMention } from "../util";
 
 const voiceChannelFromInteraction = (interaction: ChatInputCommandInteraction) => {
     const member = interaction.member as GuildMember;
@@ -26,17 +27,22 @@ export const playCommand: BotCommand = {
 
         const query = interaction.options.getString('query')!;
         const searchResult = await searchYT(query);
+        const mention = userToMention(interaction.user);
         if (searchResult) {
-            queue.enqueueMusic(guildId, voiceChannel.id, {
+            queue.add(guildId, voiceChannel.id, {
                 name: searchResult.title,
                 youtube_url: searchResult.url,
-                seconds: searchResult.duration.seconds
-            })
+                seconds: searchResult.duration.seconds,
+                added_by: interaction.user.id
+            });
+
             if (player.playMusic(guildId)) {
-                interaction.followUp(`🎵  Now playing "${searchResult.title}"!`);
+                interaction.followUp(`✅ Done`);
+                interaction.channel?.send(`🎵 Now playing "${searchResult.title}", added by ${mention}.`);
             }
             else {
-                interaction.followUp(`🎵  Added "${searchResult.title}" to the queue!`);
+                interaction.followUp(`✅ Done`);
+                interaction.channel?.send(`🎵 "${searchResult.title}" was added to the queue by ${mention}.`);
             }
         }
         else {
