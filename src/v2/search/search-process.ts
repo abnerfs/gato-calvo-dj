@@ -2,11 +2,12 @@ import ytSearch from 'yt-search';
 import { SOUNDCLOUD_CLIENT } from '../config';
 
 process.on('message', async ({platform, query}: {platform: string, query: string}) => {
+    console.log({platform, query})
     let result = null;
 
     switch (platform) {
         case "youtube":
-            result = youtube(query);
+            result = await youtube(query);
             break;
         case "soundcloud":
             result = await soundcloud(query);
@@ -16,12 +17,14 @@ process.on('message', async ({platform, query}: {platform: string, query: string
    process.send!(result);
 })
 
-function youtube(query: string) {
-    ytSearch(query, function (err: Error | string | null | undefined, r: ytSearch.SearchResult) {
-        if (err)
-            return { type: 'search-error', data: err }
-
-        return { type: 'search-success', data: r?.videos || [] }
+async function youtube(query: string) {
+    return new Promise((resolve, reject) => {
+        ytSearch(query, function (err: Error | string | null | undefined, r: ytSearch.SearchResult) {
+            if (err)
+                reject({ type: 'search-error', data: err })
+    
+            resolve({ type: 'search-success', data: r?.videos || [] })
+        })
     })
 }
 

@@ -17,6 +17,8 @@ export const playCommand: BotCommand = {
             .setRequired(true))
         .addStringOption(new SlashCommandStringOption()
             .setName('platform')
+            .setDescription('Platform to search song on')
+            .setRequired(true)
             .addChoices(
                 {name: 'youtube', value: 'youtube'}, 
                 {name: 'soundcloud', value: 'soundcloud'}))
@@ -32,9 +34,9 @@ export const playCommand: BotCommand = {
 
         const DEFAULT_PLATFORM = 'youtube';
         const query = interaction.options.getString('query')!;
-        
         const platform = interaction.options.getString('platform') ?? DEFAULT_PLATFORM;
         const mention = userToMention(interaction.user);
+        
         
         if (platform === 'youtube') {
             const searchResult = await searchYT(query);
@@ -50,8 +52,7 @@ export const playCommand: BotCommand = {
                 if (player.playMusic(guildId)) {
                     interaction.followUp(`✅ Done`);
                     interaction.channel?.send(`🎵 Now playing "${searchResult.title}", added by ${mention}.`);
-                }
-                else {
+                } else {
                     interaction.followUp(`✅ Done`);
                     interaction.channel?.send(`🎵 "${searchResult.title}" was added to the queue by ${mention}.`);
                 }
@@ -62,7 +63,7 @@ export const playCommand: BotCommand = {
             if (searchResult) {
                 queue.add(guildId, voiceChannel.id, {
                     name: searchResult.title,
-                    url: searchResult.uri,
+                    url: searchResult.permalink_url,
                     seconds: searchResult.full_duration,
                     added_by: interaction.user.id
                 });
@@ -70,8 +71,7 @@ export const playCommand: BotCommand = {
                 if (player.playMusic(guildId)) {
                     interaction.followUp(`✅ Done`);
                     interaction.channel?.send(`🎵 Now playing "${searchResult.title}", added by ${mention}.`);
-                }
-                else {
+                } else {
                     interaction.followUp(`✅ Done`);
                     interaction.channel?.send(`🎵 "${searchResult.title}" was added to the queue by ${mention}.`);
                 }

@@ -19,6 +19,8 @@ const queue = new MusicQueue();
 const player = new Player(queue, bot);
 
 bot.on(Events.InteractionCreate, (interaction: Interaction<CacheType>) => {
+    setupCommands(interaction.guild?.id!)
+    
     try {
         if (!interaction.isChatInputCommand())
             return;
