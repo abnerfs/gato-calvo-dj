@@ -18,7 +18,7 @@ export const playCommand: BotCommand = {
         .addStringOption(new SlashCommandStringOption()
             .setName('platform')
             .setDescription('Platform to search song on')
-            .setRequired(true)
+            .setRequired(false)
             .addChoices(
                 {name: 'youtube', value: 'youtube'}, 
                 {name: 'soundcloud', value: 'soundcloud'}))
@@ -38,7 +38,7 @@ export const playCommand: BotCommand = {
         const mention = userToMention(interaction.user);
         
         
-        if (platform === 'youtube') {
+        if (!platform || platform === 'youtube') {
             const searchResult = await searchYT(query);
 
             if (searchResult) {
