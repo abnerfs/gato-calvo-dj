@@ -1,8 +1,7 @@
 import { Client, VoiceBasedChannel } from "discord.js";
 import { MusicQueue } from "./logic/queue";
 import { AudioPlayer, AudioPlayerStatus, NoSubscriberBehavior, VoiceConnectionStatus, createAudioPlayer, createAudioResource, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
-import ytdl from "ytdl-core";
-
+import { youtubeDlStream } from "./youtube-dl";
 
 export class Player {
     players: { [guildId: string]: AudioPlayer | undefined } = {}
@@ -60,8 +59,9 @@ export class Player {
             return;
 
         const { channelId, music } = popResult;
+        const song = youtubeDlStream(music.url);
 
-        const resource = createAudioResource(ytdl(music.youtube_url, { filter: 'audioonly', highWaterMark: 1 << 25 }));
+        const resource = createAudioResource(song);
         const rawChannel = this.bot.guilds.cache.get(guildId)!.channels.cache.get(channelId)!;
 
         if (rawChannel.isVoiceBased()) {

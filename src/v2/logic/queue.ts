@@ -1,7 +1,10 @@
-export type Music = {
+export type MusicResult = {
     name: string;
-    youtube_url: string;
+    url: string;
     seconds: number;
+}
+
+export type Music = MusicResult & {
     added_by: string
 }
 
@@ -59,9 +62,9 @@ export class MusicQueue {
             musics: state.musics.slice(1)
         });
 
-        if(!music)
+        if (!music)
             return;
-        
+
         return {
             music: music,
             channelId: state.channelId

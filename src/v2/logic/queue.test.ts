@@ -16,8 +16,8 @@ describe('BotQueue', () => {
   });
 
   test('should enqueue and dequeue music correctly', () => {
-    const music1: Music = { name: 'Song 1', youtube_url: 'youtube.com/song1', seconds: 180, added_by };
-    const music2: Music = { name: 'Song 2', youtube_url: 'youtube.com/song2', seconds: 210, added_by };
+    const music1: Music = { name: 'Song 1', url: 'youtube.com/song1', seconds: 180, added_by };
+    const music2: Music = { name: 'Song 2', url: 'youtube.com/song2', seconds: 210, added_by };
 
     botQueue.add(guildId, channelId, music1);
     expect(botQueue.state[guildId]).toEqual({ channelId: channelId, musics: [music1] });
@@ -44,9 +44,9 @@ describe('BotQueue', () => {
   });
 
   test('should return queue considering music being currently played', () => {
-    const music1: Music = { name: 'Song 1', youtube_url: 'youtube.com/song1', seconds: 180, added_by };
-    const music2: Music = { name: 'Song 2', youtube_url: 'youtube.com/song2', seconds: 210, added_by };
-    const music3: Music = { name: 'Song 3', youtube_url: 'youtube.com/song3', seconds: 210, added_by };
+    const music1: Music = { name: 'Song 1', url: 'youtube.com/song1', seconds: 180, added_by };
+    const music2: Music = { name: 'Song 2', url: 'youtube.com/song2', seconds: 210, added_by };
+    const music3: Music = { name: 'Song 3', url: 'youtube.com/song3', seconds: 210, added_by };
 
     botQueue.add(guildId, channelId, music1);
     botQueue.add(guildId, channelId, music2);
