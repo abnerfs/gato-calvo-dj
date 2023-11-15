@@ -2,7 +2,6 @@ import ytSearch from 'yt-search';
 import { SOUNDCLOUD_CLIENT } from '../config';
 
 process.on('message', async ({platform, query}: {platform: string, query: string}) => {
-    console.log({platform, query})
     let result = null;
 
     switch (platform) {
