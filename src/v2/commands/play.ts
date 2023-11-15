@@ -20,8 +20,8 @@ export const playCommand: BotCommand = {
             .setDescription('Platform to search song on')
             .setRequired(true)
             .addChoices(
-                {name: 'youtube', value: 'youtube'}, 
-                {name: 'soundcloud', value: 'soundcloud'}))
+                {name: 'YouTube', value: 'youtube'}, 
+                {name: 'SoundCloud', value: 'soundcloud'}))
         .setDescription('Add a song to queue'),
     handler: async ({ interaction, queue, player }) => {
         const voiceChannel = voiceChannelFromInteraction(interaction);
