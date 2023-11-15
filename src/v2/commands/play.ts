@@ -55,6 +55,9 @@ export const playCommand: BotCommand = {
                 interaction.followUp(`🎵 "${searchResult.name}" was added to the queue.`);
             }
         }
+        else {
+            interaction.followUp(`❌ Zero videos found for query ${query}`);
+        }
         return;
     }
 }
