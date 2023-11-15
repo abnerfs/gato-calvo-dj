@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, GuildMember, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
 import { BotCommand } from ".";
 import { searchSC, searchYT } from "../search";
-import { userToMention } from "../util";
+import { MusicResult } from "../logic/queue";
 
 const voiceChannelFromInteraction = (interaction: ChatInputCommandInteraction) => {
     const member = interaction.member as GuildMember;
@@ -20,8 +20,8 @@ export const playCommand: BotCommand = {
             .setDescription('Platform to search song on')
             .setRequired(false)
             .addChoices(
-                {name: 'youtube', value: 'youtube'}, 
-                {name: 'soundcloud', value: 'soundcloud'}))
+                { name: 'youtube', value: 'youtube' },
+                { name: 'soundcloud', value: 'soundcloud' }))
         .setDescription('Add a song to queue'),
     handler: async ({ interaction, queue, player }) => {
         const voiceChannel = voiceChannelFromInteraction(interaction);
@@ -29,52 +29,30 @@ export const playCommand: BotCommand = {
             interaction.reply('❌ You need to be in a voice channel to use this command');
             return;
         }
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply();
         const guildId = interaction.guild!.id;
 
         const DEFAULT_PLATFORM = 'youtube';
         const query = interaction.options.getString('query')!;
         const platform = interaction.options.getString('platform') ?? DEFAULT_PLATFORM;
-        const mention = userToMention(interaction.user);
-        
-        
+
+        let searchResult: MusicResult | undefined = undefined;
         if (!platform || platform === 'youtube') {
-            const searchResult = await searchYT(query);
-
-            if (searchResult) {
-                queue.add(guildId, voiceChannel.id, {
-                    name: searchResult.title,
-                    url: searchResult.url,
-                    seconds: searchResult.duration.seconds,
-                    added_by: interaction.user.id
-                });
-    
-                if (player.playMusic(guildId)) {
-                    interaction.followUp(`✅ Done`);
-                    interaction.channel?.send(`🎵 Now playing "${searchResult.title}", added by ${mention}.`);
-                } else {
-                    interaction.followUp(`✅ Done`);
-                    interaction.channel?.send(`🎵 "${searchResult.title}" was added to the queue by ${mention}.`);
-                }
-            }
+            searchResult = await searchYT(query);
         } else if (platform === 'soundcloud') {
-            const searchResult = await searchSC(query);
+            searchResult = await searchSC(query);
+        }
 
-            if (searchResult) {
-                queue.add(guildId, voiceChannel.id, {
-                    name: searchResult.title,
-                    url: searchResult.permalink_url,
-                    seconds: searchResult.full_duration,
-                    added_by: interaction.user.id
-                });
-    
-                if (player.playMusic(guildId)) {
-                    interaction.followUp(`✅ Done`);
-                    interaction.channel?.send(`🎵 Now playing "${searchResult.title}", added by ${mention}.`);
-                } else {
-                    interaction.followUp(`✅ Done`);
-                    interaction.channel?.send(`🎵 "${searchResult.title}" was added to the queue by ${mention}.`);
-                }
+        if (searchResult) {
+            queue.add(guildId, voiceChannel.id, {
+                ...searchResult,
+                added_by: interaction.user.id
+            });
+
+            if (player.playMusic(guildId)) {
+                interaction.followUp(`🎵 Now playing "${searchResult.name}".`);
+            } else {
+                interaction.followUp(`🎵 "${searchResult.name}" was added to the queue.`);
             }
         }
         return;

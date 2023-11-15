@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { BotCommand, setupCommands } from ".";
+import { BotCommand } from ".";
 import { embedFactory } from "../messages";
 
 const formatDuration = (totalSeconds: number) => {
