@@ -28,7 +28,7 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Build and push
-        uses: docker/build-bush-action@v6
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: ${{env.DOCKER_REPOSITORY}}:${VERSION}

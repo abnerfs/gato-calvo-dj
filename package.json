@@ -1,12 +1,12 @@
 {
   "name": "bot-musica-poc",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only src/v2/index.ts",
-    "start": "node dist/index.js",
+    "start:dev": "ts-node-dev --respawn --transpile-only src/v2/index.ts",
+    "start:prod": "pm2 start dist/index.js --name bot-musica-poc",
     "test": "jest"
   },
   "keywords": [],

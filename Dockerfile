@@ -13,5 +13,6 @@ RUN npm install
 COPY . .
 
 RUN npm run build
+RUN npm install pm2@latest -g
 ENV YTDLP_PATH=/root/.local/bin/yt-dlp
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:prod"]
