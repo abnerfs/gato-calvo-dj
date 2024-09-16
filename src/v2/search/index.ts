@@ -3,6 +3,7 @@ import path from "path";
 import { VideoSearchResult } from "yt-search";
 import { SoundcloudTrackV2 } from "soundcloud.ts";
 import { MusicResult } from "../logic/queue";
+import './search-process'
 
 const searchProcess = fork(path.join(__dirname, 'search-process'));
 
