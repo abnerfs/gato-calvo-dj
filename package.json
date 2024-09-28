@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start:dev": "ts-node-dev --respawn --transpile-only src/v2/index.ts",
-    "start:prod": "pm2 start dist/index.js --name bot-musica-poc",
+    "start:prod": "node dist/index.js",
     "test": "jest"
   },
   "keywords": [],

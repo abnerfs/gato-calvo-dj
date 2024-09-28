@@ -1,0 +1,5 @@
+# test build
+docker build . --tag abnerfs/bot-musica-poc  --progress=plain
+
+# test run
+docker run -d -e BOT_TOKEN=XXX -e BOT_CLIENT_ID=XXX --name bot-musica-poc  abnerfs/bot-musica-poc
