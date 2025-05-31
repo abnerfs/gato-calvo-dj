@@ -1,5 +1,5 @@
 # Gato Calvo DJ
-Prove of concept discord bot to listen to music alongside your friends, made for learning purposes, feel free to use it anyway you like.
+Proof of concept discord bot to listen to music alongside your friends, made for learning purposes, feel free to use it anyway you like.
 
 ![_193bb449-216d-494f-ba62-a9463c93e589](https://github.com/abnerfs/bot-musica-poc/assets/14078661/8b19256c-018f-4b6a-bf60-c883fcd3d441)
 

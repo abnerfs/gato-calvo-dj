@@ -1,6 +1,6 @@
 import { Client, VoiceBasedChannel } from "discord.js";
 import { MusicQueue } from "./logic/queue";
-import { AudioPlayer, AudioPlayerStatus, NoSubscriberBehavior, VoiceConnectionStatus, createAudioPlayer, createAudioResource, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus, DiscordGatewayAdapterCreator, NoSubscriberBehavior, VoiceConnectionStatus, createAudioPlayer, createAudioResource, getVoiceConnection, joinVoiceChannel } from "@discordjs/voice";
 import { youtubeDlStream } from "./youtube-dl";
 
 export class Player {
@@ -69,7 +69,7 @@ export class Player {
             const connection = joinVoiceChannel({
                 channelId: channelId,
                 guildId: guildId,
-                adapterCreator: channel.guild.voiceAdapterCreator,
+                adapterCreator: channel.guild.voiceAdapterCreator as DiscordGatewayAdapterCreator,
                 selfMute: false
             });
 

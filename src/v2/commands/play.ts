@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, GuildMember, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
-import { BotCommand, setupCommands } from ".";
+import { BotCommand } from ".";
 import { searchSC, searchYT } from "../search";
 import { MusicResult } from "../logic/queue";
 
@@ -22,7 +22,7 @@ export const playCommand: BotCommand = {
             .addChoices(
                 { name: 'YouTube', value: 'youtube' },
                 { name: 'SoundCloud', value: 'soundcloud' }))
-        .setDescription('Add a song to queue'),
+        .setDescription('Add a song to queue') as SlashCommandBuilder,
     handler: async ({ interaction, queue, player }) => {
         await interaction.deferReply();
 
