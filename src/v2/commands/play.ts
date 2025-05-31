@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, GuildMember, SlashCommandBuilder, SlashCommandStringOption } from "discord.js";
-import { BotCommand } from ".";
+import { BotCommand, setupCommands } from ".";
 import { searchSC, searchYT } from "../search";
 import { MusicResult } from "../logic/queue";
 
@@ -24,14 +24,15 @@ export const playCommand: BotCommand = {
                 { name: 'SoundCloud', value: 'soundcloud' }))
         .setDescription('Add a song to queue'),
     handler: async ({ interaction, queue, player }) => {
+        await interaction.deferReply();
+
         const voiceChannel = voiceChannelFromInteraction(interaction);
         if (!voiceChannel) {
-            interaction.reply('❌ You need to be in a voice channel to use this command');
+            await interaction.followUp('❌ You need to be in a voice channel to use this command');
             return;
         }
-        await interaction.deferReply();
-        const guildId = interaction.guild!.id;
 
+        const guildId = interaction.guild!.id;
         const DEFAULT_PLATFORM = 'youtube';
         const query = interaction.options.getString('query')!;
         const platform = interaction.options.getString('platform') ?? DEFAULT_PLATFORM;
@@ -50,13 +51,13 @@ export const playCommand: BotCommand = {
             });
 
             if (player.playMusic(guildId)) {
-                interaction.followUp(`🎵 Now playing "${searchResult.name}".`);
+                await interaction.followUp(`🎵 Now playing "${searchResult.name}".`);
             } else {
-                interaction.followUp(`🎵 "${searchResult.name}" was added to the queue.`);
+                await interaction.followUp(`🎵 "${searchResult.name}" was added to the queue.`);
             }
         }
         else {
-            interaction.followUp(`❌ Zero videos found for query ${query}`);
+            await interaction.followUp(`❌ Zero videos found for query ${query}`);
         }
         return;
     }

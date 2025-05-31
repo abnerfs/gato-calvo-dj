@@ -43,7 +43,7 @@ export const queueCommand: BotCommand = {
                 },
                 description: queue
             })
-            interaction.reply({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed] });
         }
     }
 }

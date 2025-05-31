@@ -8,6 +8,6 @@ export const skipCommand: BotCommand = {
     handler: async ({ interaction, player }) => {
         const guildId = interaction.guild!.id;
         player.skip(guildId);
-        interaction.reply('✅ Done');
+        await interaction.reply('✅ Done');
     }
 }
